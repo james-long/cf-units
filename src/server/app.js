@@ -29,4 +29,10 @@ app.get('/units/:unitID', (req, res) => {
     });
 });
 
+// Endpoint to retrieve unit images
+app.get('/unitimages/:unitID', (req, res) => {
+    let fullID = req.params["unitID"].padStart(4, "0");
+    res.sendFile(__dirname + "/unitSprites/Unit" + fullID + ".png");
+});
+
 app.listen(8000, () => console.log("Server listening on port 8000"));

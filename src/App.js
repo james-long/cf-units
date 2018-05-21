@@ -1,91 +1,88 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import "react-bootstrap";
 import './App.css';
 
 class Unit extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            name: "NULL"
+            unitInfo : {},
+            unitImageSrc : ""
         };
     }
 
     componentDidMount(){
         fetch("units/" + this.props.id)
-            //.then(({results}) => this.setState({name : results["Name"]}))
             .then((results) => {
-                return results.json()
+                return results.json();
             })
             .then((resultsJSON) => {
-                this.setState({name: resultsJSON["Name"]});
+                this.setState({unitInfo: resultsJSON});
+            })
+            .catch((err) => console.log(err));
+
+        fetch("unitimages/" + this.props.id)
+            .then((results) => {
+                this.setState({unitImageSrc: results["url"]});
             })
             .catch((err) => console.log(err));
     }
 
     render(){
-        return (<h1>{this.state.name}</h1>);
+        const unitInfo = this.state["unitInfo"];
+        const unitImageSrc = this.state["unitImageSrc"];
+
+        const containerStyle = {
+            backgroundColor : unitInfo["Color"],
+            marginBottom : "10px",
+            marginTop : "10px",
+            padding : "10px 0px 10px 0px"
+        };
+
+        const textStyle = {
+            color : "white"
+        };
+
+        return (
+            <div className = "col-lg-8 offset-lg-2" style = {containerStyle}>
+                <img src = {unitImageSrc}/>
+                <p style = {textStyle}>
+                    {unitInfo["Name"] === undefined ?
+                        "NOT A UNIT" : unitInfo["Name"]}
+                </p>
+            </div>
+        );
     }
 }
 
 class App extends Component {
     constructor(props){
         super(props);
+
+        let initialUnits = [];
+        for(let i = 1; i < 100; i++){
+            initialUnits.push(i);
+        }
+
         this.state = {
-            units: [1, 2, 3, 4]
+            units: initialUnits
         };
     }
 
     render(){
         let unitList = [];
         for (let unitID of this.state.units){
-            unitList.push(<Unit id={unitID}/>);
+            unitList.push(<Unit id={unitID} key={unitID}/>);
         }
         return (
             <div className="App">
                 <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h1 className="App-title">Welcome to React</h1>
                 </header>
+                <div />
                 {unitList}
             </div>
         )
     }
 }
 
-/*
-class App extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            units: [1, 2, 3, 4]
-        };
-    }
-
-    componentDidMount(){
-        fetch("units/666", {method: "GET", headers: {"Access-Control-Allow-Origin": "*",
-            "Content-Type": "text/plain", "mode" : "no-cors"}})
-        //.then(({results}) => this.setState({name : results["Name"]}))
-            .then((results) => {
-                console.log(results);
-                return results.json()
-            })
-            .then((resultsJSON) => {
-                console.log(resultsJSON);
-            })
-            .catch((err) => console.log(err));
-    }
-
-    render(){
-
-        return (
-            <div className="App">
-            <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
-            </header>
-            </div>
-        )
-    }
-}
-*/
 export default App;
